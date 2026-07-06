@@ -11,18 +11,28 @@ class InvoiceDetail extends Model
 
     protected $fillable = [
         'invoice_id',
-        'produk_id',
-        'qty',
-        'harga_satuan',
-        'subtotal',
+        'tanggal_kirim',
+        'no_pol',
+        'penerima',
+        'sa_no',
+        'surat_jalan',
+        'tujuan',
+        'keterangan',
+        'colly',
+        'tonase',
+        'satuan',
+        'tarif',
+        'jumlah',
     ];
 
     protected function casts(): array
     {
         return [
-            'qty' => 'integer',
-            'harga_satuan' => 'decimal:2',
-            'subtotal' => 'decimal:2',
+            'tanggal_kirim' => 'date',
+            'colly' => 'integer',
+            'tonase' => 'decimal:2',
+            'tarif' => 'decimal:2',
+            'jumlah' => 'decimal:2',
         ];
     }
 
@@ -32,13 +42,5 @@ class InvoiceDetail extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
-    }
-
-    /**
-     * InvoiceDetail milik satu Produk.
-     */
-    public function produk(): BelongsTo
-    {
-        return $this->belongsTo(Produk::class);
     }
 }

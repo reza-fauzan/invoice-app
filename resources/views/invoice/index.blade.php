@@ -7,7 +7,7 @@
     <div class="page-header">
         <div>
             <h1>Invoice</h1>
-            <p>Kelola semua invoice Anda.</p>
+            <p>Kelola semua invoice pengiriman.</p>
         </div>
         <div class="page-header-actions">
             <a href="{{ route('invoice.create') }}" class="btn btn-primary btn-sm">
@@ -58,6 +58,7 @@
                     <th>No. Invoice</th>
                     <th>Pelanggan</th>
                     <th>Tanggal</th>
+                    <th>Jatuh Tempo</th>
                     <th>Total</th>
                     <th>Status</th>
                     <th>Aksi</th>
@@ -66,9 +67,10 @@
             <tbody>
                 @forelse($invoices as $invoice)
                     <tr>
-                        <td class="mono" style="color: var(--color-text); font-weight: 600;">{{ $invoice->nomor_invoice }}</td>
+                        <td class="mono" style="font-weight: 600; color: var(--color-text);">{{ $invoice->nomor_invoice }}</td>
                         <td style="font-weight: 500; color: var(--color-text);">{{ $invoice->pelanggan->nama_pelanggan }}</td>
-                        <td>{{ $invoice->tanggal_invoice->format('d M Y') }}</td>
+                        <td>{{ $invoice->tanggal_invoice->format('d/m/Y') }}</td>
+                        <td>{{ $invoice->tanggal_jatuh_tempo ? $invoice->tanggal_jatuh_tempo->format('d/m/Y') : '-' }}</td>
                         <td class="mono" style="color: var(--color-text);">Rp {{ number_format($invoice->total_tagihan, 0, ',', '.') }}</td>
                         <td>
                             @php
@@ -111,7 +113,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" style="text-align: center; padding: 48px 24px; color: var(--color-text-muted);">
+                        <td colspan="7" style="text-align: center; padding: 48px 24px; color: var(--color-text-muted);">
                             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 14px; opacity: 0.35;">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                                 <polyline points="14 2 14 8 20 8"/>

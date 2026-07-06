@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\Pelanggan;
-use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,7 +17,6 @@ class InvoiceController extends Controller
     {
         $query = Invoice::with('pelanggan');
 
-        // Search
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -29,7 +27,6 @@ class InvoiceController extends Controller
             });
         }
 
-        // Filter status
         if ($request->filled('status')) {
             $query->where('status_pembayaran', $request->status);
         }
@@ -45,9 +42,8 @@ class InvoiceController extends Controller
     public function create()
     {
         $pelanggans = Pelanggan::orderBy('nama_pelanggan')->get();
-        $produks = Produk::orderBy('nama_produk')->get();
 
-        return view('invoice.create', compact('pelanggans', 'produks'));
+        return view('invoice.create', compact('pelanggans'));
     }
 
     /**
@@ -56,58 +52,70 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pelanggan_id'      => 'required|exists:pelanggans,id',
-            'tanggal_invoice'   => 'required|date',
-            'status_pembayaran' => 'required|in:Draft,Unpaid,Paid,Canceled',
-            'items'             => 'required|array|min:1',
-            'items.*.produk_id' => 'required|exists:produks,id',
-            'items.*.qty'       => 'required|integer|min:1',
+            'pelanggan_id'        => 'required|exists:pelanggans,id',
+            'nomor_invoice'       => 'required|string|max:50|unique:invoices,nomor_invoice',
+            'tanggal_invoice'     => 'required|date',
+            'tanggal_jatuh_tempo' => 'nullable|date',
+            'status_pembayaran'   => 'required|in:Draft,Unpaid,Paid,Canceled',
+            'items'               => 'required|array|min:1',
+            'items.*.tanggal_kirim' => 'required|date',
+            'items.*.no_pol'      => 'nullable|string|max:20',
+            'items.*.penerima'    => 'nullable|string|max:255',
+            'items.*.sa_no'       => 'nullable|string|max:50',
+            'items.*.surat_jalan' => 'nullable|string',
+            'items.*.tujuan'      => 'nullable|string|max:100',
+            'items.*.keterangan'  => 'nullable|string|max:100',
+            'items.*.colly'       => 'nullable|integer|min:0',
+            'items.*.tonase'      => 'required|numeric|min:0',
+            'items.*.satuan'      => 'nullable|string|max:20',
+            'items.*.tarif'       => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated, $request) {
-            // Generate nomor invoice: INV-YYYYMMDD-XXXX
-            $today = now()->format('Ymd');
-            $lastInvoice = Invoice::where('nomor_invoice', 'like', "INV-{$today}-%")
-                ->orderBy('nomor_invoice', 'desc')
-                ->first();
+            $subTotal = 0;
 
-            if ($lastInvoice) {
-                $lastNumber = (int) substr($lastInvoice->nomor_invoice, -4);
-                $newNumber = str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-            } else {
-                $newNumber = '0001';
+            // Hitung sub total
+            foreach ($request->items as $item) {
+                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
+                $subTotal += $jumlah;
             }
 
-            $nomorInvoice = "INV-{$today}-{$newNumber}";
+            // Hitung DPP dan PPN
+            $dpp = $subTotal * 11 / 12;
+            $ppn = $dpp * 0.12;
+            $totalTagihan = $subTotal + $ppn - ($subTotal - $dpp); // = dpp + ppn = sub_total
 
-            // Buat invoice
             $invoice = Invoice::create([
-                'pelanggan_id'      => $validated['pelanggan_id'],
-                'nomor_invoice'     => $nomorInvoice,
-                'tanggal_invoice'   => $validated['tanggal_invoice'],
-                'status_pembayaran' => $validated['status_pembayaran'],
-                'total_tagihan'     => 0,
+                'pelanggan_id'        => $validated['pelanggan_id'],
+                'nomor_invoice'       => $validated['nomor_invoice'],
+                'tanggal_invoice'     => $validated['tanggal_invoice'],
+                'tanggal_jatuh_tempo' => $validated['tanggal_jatuh_tempo'] ?? null,
+                'status_pembayaran'   => $validated['status_pembayaran'],
+                'sub_total'           => $subTotal,
+                'dpp'                 => round($dpp),
+                'ppn'                 => round($ppn),
+                'total_tagihan'       => round($dpp + $ppn),
             ]);
 
-            // Buat detail items
-            $totalTagihan = 0;
-
             foreach ($request->items as $item) {
-                $produk = Produk::find($item['produk_id']);
-                $subtotal = $produk->harga * $item['qty'];
-                $totalTagihan += $subtotal;
+                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
 
                 InvoiceDetail::create([
-                    'invoice_id'   => $invoice->id,
-                    'produk_id'    => $item['produk_id'],
-                    'qty'          => $item['qty'],
-                    'harga_satuan' => $produk->harga,
-                    'subtotal'     => $subtotal,
+                    'invoice_id'    => $invoice->id,
+                    'tanggal_kirim' => $item['tanggal_kirim'],
+                    'no_pol'        => $item['no_pol'] ?? null,
+                    'penerima'      => $item['penerima'] ?? null,
+                    'sa_no'         => $item['sa_no'] ?? null,
+                    'surat_jalan'   => $item['surat_jalan'] ?? null,
+                    'tujuan'        => $item['tujuan'] ?? null,
+                    'keterangan'    => $item['keterangan'] ?? null,
+                    'colly'         => $item['colly'] ?? null,
+                    'tonase'        => $item['tonase'] ?? 0,
+                    'satuan'        => $item['satuan'] ?? 'Kg',
+                    'tarif'         => $item['tarif'] ?? 0,
+                    'jumlah'        => $jumlah,
                 ]);
             }
-
-            // Update total tagihan
-            $invoice->update(['total_tagihan' => $totalTagihan]);
         });
 
         return redirect()->route('invoice.index')
@@ -119,7 +127,7 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(['pelanggan', 'invoiceDetails.produk', 'pembayarans']);
+        $invoice->load(['pelanggan', 'invoiceDetails', 'pembayarans']);
 
         return view('invoice.show', compact('invoice'));
     }
@@ -129,11 +137,10 @@ class InvoiceController extends Controller
      */
     public function edit(Invoice $invoice)
     {
-        $invoice->load('invoiceDetails.produk');
+        $invoice->load('invoiceDetails');
         $pelanggans = Pelanggan::orderBy('nama_pelanggan')->get();
-        $produks = Produk::orderBy('nama_produk')->get();
 
-        return view('invoice.edit', compact('invoice', 'pelanggans', 'produks'));
+        return view('invoice.edit', compact('invoice', 'pelanggans'));
     }
 
     /**
@@ -142,42 +149,69 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
         $validated = $request->validate([
-            'pelanggan_id'      => 'required|exists:pelanggans,id',
-            'tanggal_invoice'   => 'required|date',
-            'status_pembayaran' => 'required|in:Draft,Unpaid,Paid,Canceled',
-            'items'             => 'required|array|min:1',
-            'items.*.produk_id' => 'required|exists:produks,id',
-            'items.*.qty'       => 'required|integer|min:1',
+            'pelanggan_id'        => 'required|exists:pelanggans,id',
+            'nomor_invoice'       => 'required|string|max:50|unique:invoices,nomor_invoice,' . $invoice->id,
+            'tanggal_invoice'     => 'required|date',
+            'tanggal_jatuh_tempo' => 'nullable|date',
+            'status_pembayaran'   => 'required|in:Draft,Unpaid,Paid,Canceled',
+            'items'               => 'required|array|min:1',
+            'items.*.tanggal_kirim' => 'required|date',
+            'items.*.no_pol'      => 'nullable|string|max:20',
+            'items.*.penerima'    => 'nullable|string|max:255',
+            'items.*.sa_no'       => 'nullable|string|max:50',
+            'items.*.surat_jalan' => 'nullable|string',
+            'items.*.tujuan'      => 'nullable|string|max:100',
+            'items.*.keterangan'  => 'nullable|string|max:100',
+            'items.*.colly'       => 'nullable|integer|min:0',
+            'items.*.tonase'      => 'required|numeric|min:0',
+            'items.*.satuan'      => 'nullable|string|max:20',
+            'items.*.tarif'       => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated, $request, $invoice) {
-            // Update invoice
-            $invoice->update([
-                'pelanggan_id'      => $validated['pelanggan_id'],
-                'tanggal_invoice'   => $validated['tanggal_invoice'],
-                'status_pembayaran' => $validated['status_pembayaran'],
-            ]);
-
-            // Hapus detail lama dan buat ulang
-            $invoice->invoiceDetails()->delete();
-
-            $totalTagihan = 0;
+            $subTotal = 0;
 
             foreach ($request->items as $item) {
-                $produk = Produk::find($item['produk_id']);
-                $subtotal = $produk->harga * $item['qty'];
-                $totalTagihan += $subtotal;
-
-                InvoiceDetail::create([
-                    'invoice_id'   => $invoice->id,
-                    'produk_id'    => $item['produk_id'],
-                    'qty'          => $item['qty'],
-                    'harga_satuan' => $produk->harga,
-                    'subtotal'     => $subtotal,
-                ]);
+                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
+                $subTotal += $jumlah;
             }
 
-            $invoice->update(['total_tagihan' => $totalTagihan]);
+            $dpp = $subTotal * 11 / 12;
+            $ppn = $dpp * 0.12;
+
+            $invoice->update([
+                'pelanggan_id'        => $validated['pelanggan_id'],
+                'nomor_invoice'       => $validated['nomor_invoice'],
+                'tanggal_invoice'     => $validated['tanggal_invoice'],
+                'tanggal_jatuh_tempo' => $validated['tanggal_jatuh_tempo'] ?? null,
+                'status_pembayaran'   => $validated['status_pembayaran'],
+                'sub_total'           => $subTotal,
+                'dpp'                 => round($dpp),
+                'ppn'                 => round($ppn),
+                'total_tagihan'       => round($dpp + $ppn),
+            ]);
+
+            $invoice->invoiceDetails()->delete();
+
+            foreach ($request->items as $item) {
+                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
+
+                InvoiceDetail::create([
+                    'invoice_id'    => $invoice->id,
+                    'tanggal_kirim' => $item['tanggal_kirim'],
+                    'no_pol'        => $item['no_pol'] ?? null,
+                    'penerima'      => $item['penerima'] ?? null,
+                    'sa_no'         => $item['sa_no'] ?? null,
+                    'surat_jalan'   => $item['surat_jalan'] ?? null,
+                    'tujuan'        => $item['tujuan'] ?? null,
+                    'keterangan'    => $item['keterangan'] ?? null,
+                    'colly'         => $item['colly'] ?? null,
+                    'tonase'        => $item['tonase'] ?? 0,
+                    'satuan'        => $item['satuan'] ?? 'Kg',
+                    'tarif'         => $item['tarif'] ?? 0,
+                    'jumlah'        => $jumlah,
+                ]);
+            }
         });
 
         return redirect()->route('invoice.show', $invoice)
@@ -193,5 +227,15 @@ class InvoiceController extends Controller
 
         return redirect()->route('invoice.index')
             ->with('success', 'Invoice berhasil dihapus.');
+    }
+
+    /**
+     * Cetak invoice.
+     */
+    public function print(Invoice $invoice)
+    {
+        $invoice->load(['pelanggan', 'invoiceDetails']);
+
+        return view('invoice.print', compact('invoice'));
     }
 }

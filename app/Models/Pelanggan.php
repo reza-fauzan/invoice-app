@@ -15,6 +15,7 @@ class Pelanggan extends Model
         'alamat',
         'telepon',
         'email',
+        'npwp',
     ];
 
     /**

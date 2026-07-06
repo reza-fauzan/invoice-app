@@ -15,15 +15,23 @@ class Invoice extends Model
         'pelanggan_id',
         'nomor_invoice',
         'tanggal_invoice',
+        'tanggal_jatuh_tempo',
         'status_pembayaran',
         'total_tagihan',
+        'sub_total',
+        'dpp',
+        'ppn',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_invoice' => 'date',
+            'tanggal_jatuh_tempo' => 'date',
             'total_tagihan' => 'decimal:2',
+            'sub_total' => 'decimal:2',
+            'dpp' => 'decimal:2',
+            'ppn' => 'decimal:2',
         ];
     }
 

@@ -21,7 +21,7 @@
     </div>
 
     {{-- Form --}}
-    <div class="card" style="max-width: 640px;">
+    <div class="card">
         <form action="{{ route('pelanggan.update', $pelanggan) }}" method="POST">
             @csrf
             @method('PUT')
@@ -36,28 +36,35 @@
                     @enderror
                 </div>
 
-                {{-- Email --}}
-                <div>
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" id="email" class="form-input" placeholder="contoh@email.com" value="{{ old('email', $pelanggan->email) }}">
-                    @error('email')
-                        <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Telepon --}}
-                <div>
-                    <label for="telepon" class="form-label">Telepon</label>
-                    <input type="text" name="telepon" id="telepon" class="form-input" placeholder="08xxxxxxxxxx" value="{{ old('telepon', $pelanggan->telepon) }}">
-                    @error('telepon')
-                        <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
-                    @enderror
+                {{-- Email, Telepon, NPWP (3 kolom) --}}
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" id="email" class="form-input" placeholder="contoh@email.com" value="{{ old('email', $pelanggan->email) }}">
+                        @error('email')
+                            <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="telepon" class="form-label">Telepon</label>
+                        <input type="text" name="telepon" id="telepon" class="form-input" placeholder="08xxxxxxxxxx" value="{{ old('telepon', $pelanggan->telepon) }}">
+                        @error('telepon')
+                            <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="npwp" class="form-label">NPWP 16</label>
+                        <input type="text" name="npwp" id="npwp" class="form-input" placeholder="00000000000000000" value="{{ old('npwp', $pelanggan->npwp) }}" style="font-family: var(--font-mono);">
+                        @error('npwp')
+                            <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 {{-- Alamat --}}
                 <div>
                     <label for="alamat" class="form-label">Alamat</label>
-                    <textarea name="alamat" id="alamat" class="form-input" rows="3" placeholder="Masukkan alamat lengkap">{{ old('alamat', $pelanggan->alamat) }}</textarea>
+                    <textarea name="alamat" id="alamat" class="form-input" rows="4" placeholder="Masukkan alamat lengkap">{{ old('alamat', $pelanggan->alamat) }}</textarea>
                     @error('alamat')
                         <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                     @enderror

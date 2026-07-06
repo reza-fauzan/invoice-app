@@ -7,7 +7,7 @@
     <div class="page-header">
         <div>
             <h1>Buat Invoice</h1>
-            <p>Buat invoice baru untuk pelanggan.</p>
+            <p>Buat invoice pengiriman baru.</p>
         </div>
         <div class="page-header-actions">
             <a href="{{ route('invoice.index') }}" class="btn btn-secondary btn-sm">
@@ -27,10 +27,10 @@
         <div class="card" style="margin-bottom: 20px;">
             <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--color-text);">Informasi Invoice</h3>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 {{-- Pelanggan --}}
                 <div>
-                    <label for="pelanggan_id" class="form-label">Pelanggan <span style="color: var(--color-danger);">*</span></label>
+                    <label for="pelanggan_id" class="form-label">Pelanggan (Kepada Yth.) <span style="color: var(--color-danger);">*</span></label>
                     <select name="pelanggan_id" id="pelanggan_id" class="form-input" required>
                         <option value="">— Pilih Pelanggan —</option>
                         @foreach($pelanggans as $pelanggan)
@@ -44,11 +44,31 @@
                     @enderror
                 </div>
 
+                {{-- Nomor Invoice --}}
+                <div>
+                    <label for="nomor_invoice" class="form-label">No. Invoice <span style="color: var(--color-danger);">*</span></label>
+                    <input type="text" name="nomor_invoice" id="nomor_invoice" class="form-input" placeholder="S.JM260403" value="{{ old('nomor_invoice') }}" required style="font-family: var(--font-mono);">
+                    @error('nomor_invoice')
+                        <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 20px;">
                 {{-- Tanggal --}}
                 <div>
                     <label for="tanggal_invoice" class="form-label">Tanggal Invoice <span style="color: var(--color-danger);">*</span></label>
                     <input type="date" name="tanggal_invoice" id="tanggal_invoice" class="form-input" value="{{ old('tanggal_invoice', date('Y-m-d')) }}" required>
                     @error('tanggal_invoice')
+                        <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Jatuh Tempo --}}
+                <div>
+                    <label for="tanggal_jatuh_tempo" class="form-label">Tgl Jatuh Tempo</label>
+                    <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo" class="form-input" value="{{ old('tanggal_jatuh_tempo') }}">
+                    @error('tanggal_jatuh_tempo')
                         <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                     @enderror
                 </div>
@@ -68,48 +88,61 @@
             </div>
         </div>
 
-        {{-- Invoice Items --}}
+        {{-- Detail Pengiriman --}}
         <div class="card" style="margin-bottom: 20px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text);">Item Produk</h3>
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--color-text);">Detail Pengiriman</h3>
                 <button type="button" class="btn btn-primary btn-sm" onclick="addItem()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"/>
                         <line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
-                    Tambah Item
+                    Tambah Baris
                 </button>
             </div>
 
-            @error('items')
-                <div class="alert alert-danger" style="margin-bottom: 16px;">{{ $message }}</div>
-            @enderror
-
-            <table id="itemsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 40%;">Produk</th>
-                        <th style="width: 12%;">Qty</th>
-                        <th style="width: 20%;">Harga Satuan</th>
-                        <th style="width: 20%;">Subtotal</th>
-                        <th style="width: 8%;"></th>
-                    </tr>
-                </thead>
-                <tbody id="itemsBody">
-                    {{-- Row template via JS --}}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: right; font-weight: 700; font-size: 15px; color: var(--color-text); padding: 16px 24px;">
-                            Total Tagihan
-                        </td>
-                        <td style="font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--color-primary); padding: 16px 24px;" id="grandTotal">
-                            Rp 0
-                        </td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
+            <div style="overflow-x: auto;">
+                <table id="itemsTable" style="min-width: 1100px;">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Tanggal</th>
+                            <th style="width: 90px;">No-Pol</th>
+                            <th style="width: 140px;">Penerima</th>
+                            <th style="width: 100px;">Srt Jalan</th>
+                            <th style="width: 90px;">Tujuan</th>
+                            <th style="width: 70px;">KET</th>
+                            <th style="width: 60px;">Colly</th>
+                            <th style="width: 90px;">Tonase</th>
+                            <th style="width: 90px;">Tarif/Kg</th>
+                            <th style="width: 100px;">Jumlah</th>
+                            <th style="width: 40px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="9" style="text-align: right; font-weight: 700; font-size: 14px; color: var(--color-text); padding: 10px 16px;">Sub Total</td>
+                            <td class="mono" style="font-weight: 700; font-size: 14px; color: var(--color-text); padding: 10px 16px;" id="subTotal">Rp 0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">DPP (11/12)</td>
+                            <td class="mono" style="font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;" id="dppTotal">Rp 0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">PPN 12% dari DPP</td>
+                            <td class="mono" style="font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;" id="ppnTotal">Rp 0</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="text-align: right; font-weight: 700; font-size: 16px; color: var(--color-primary); padding: 12px 16px; border-top: 2px solid var(--color-border);">Total</td>
+                            <td class="mono" style="font-weight: 700; font-size: 16px; color: var(--color-primary); padding: 12px 16px; border-top: 2px solid var(--color-border);" id="grandTotal">Rp 0</td>
+                            <td style="border-top: 2px solid var(--color-border);"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
 
         {{-- Submit --}}
@@ -129,94 +162,105 @@
 
 @push('scripts')
 <script>
-    const produks = @json($produks);
     let itemIndex = 0;
+    const inputStyle = 'font-size: 12px; padding: 6px 8px;';
 
-    function addItem(produkId = '', qty = 1) {
+    function addItem(data = {}) {
         const tbody = document.getElementById('itemsBody');
         const row = document.createElement('tr');
         row.id = `item-row-${itemIndex}`;
 
-        let produkOptions = '<option value="">— Pilih Produk —</option>';
-        produks.forEach(p => {
-            const selected = p.id == produkId ? 'selected' : '';
-            produkOptions += `<option value="${p.id}" data-harga="${p.harga}" ${selected}>${p.nama_produk}</option>`;
-        });
-
         row.innerHTML = `
-            <td style="padding: 12px 24px;">
-                <select name="items[${itemIndex}][produk_id]" class="form-input produk-select" data-index="${itemIndex}" onchange="updateRow(${itemIndex})" required style="font-size: 13px; padding: 8px 10px;">
-                    ${produkOptions}
-                </select>
+            <td style="padding: 6px 4px;">
+                <input type="date" name="items[${itemIndex}][tanggal_kirim]" class="form-input" value="${data.tanggal_kirim || ''}" required style="${inputStyle}">
             </td>
-            <td style="padding: 12px 8px;">
-                <input type="number" name="items[${itemIndex}][qty]" class="form-input qty-input" value="${qty}" min="1" onchange="updateRow(${itemIndex})" oninput="updateRow(${itemIndex})" required style="font-size: 13px; padding: 8px 10px; text-align: center; font-family: var(--font-mono);">
+            <td style="padding: 6px 4px;">
+                <input type="text" name="items[${itemIndex}][no_pol]" class="form-input" value="${data.no_pol || ''}" placeholder="B 1234 XX" style="${inputStyle} text-transform: uppercase;">
             </td>
-            <td style="padding: 12px 8px;">
-                <span class="mono harga-satuan" id="harga-${itemIndex}" style="font-size: 13px; color: var(--color-text-secondary);">Rp 0</span>
+            <td style="padding: 6px 4px;">
+                <input type="text" name="items[${itemIndex}][penerima]" class="form-input" value="${data.penerima || ''}" placeholder="Penerima" style="${inputStyle}">
             </td>
-            <td style="padding: 12px 8px;">
-                <span class="mono subtotal" id="subtotal-${itemIndex}" style="font-size: 13px; font-weight: 600; color: var(--color-text);">Rp 0</span>
+            <td style="padding: 6px 4px;">
+                <input type="text" name="items[${itemIndex}][surat_jalan]" class="form-input" value="${data.surat_jalan || ''}" placeholder="No. SJ" style="${inputStyle} font-family: var(--font-mono);">
             </td>
-            <td style="padding: 12px 8px; text-align: center;">
-                <button type="button" class="btn-icon" onclick="removeItem(${itemIndex})" title="Hapus" style="color: var(--color-danger); width: 30px; height: 30px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+            <td style="padding: 6px 4px;">
+                <input type="text" name="items[${itemIndex}][tujuan]" class="form-input" value="${data.tujuan || ''}" placeholder="Kota" style="${inputStyle}">
+            </td>
+            <td style="padding: 6px 4px;">
+                <input type="text" name="items[${itemIndex}][keterangan]" class="form-input" value="${data.keterangan || ''}" placeholder="KET" style="${inputStyle}">
+            </td>
+            <td style="padding: 6px 4px;">
+                <input type="number" name="items[${itemIndex}][colly]" class="form-input" value="${data.colly || ''}" min="0" style="${inputStyle} text-align: center;">
+            </td>
+            <td style="padding: 6px 4px;">
+                <input type="number" name="items[${itemIndex}][tonase]" class="form-input tonase-input" value="${data.tonase || ''}" step="0.01" min="0" required onchange="calcRow(${itemIndex})" oninput="calcRow(${itemIndex})" style="${inputStyle} font-family: var(--font-mono); text-align: right;">
+            </td>
+            <td style="padding: 6px 4px;">
+                <input type="number" name="items[${itemIndex}][tarif]" class="form-input tarif-input" value="${data.tarif || ''}" step="0.01" min="0" required onchange="calcRow(${itemIndex})" oninput="calcRow(${itemIndex})" style="${inputStyle} font-family: var(--font-mono); text-align: right;">
+            </td>
+            <td style="padding: 6px 4px;">
+                <span class="mono jumlah-display" id="jumlah-${itemIndex}" style="font-size: 12px; font-weight: 600; color: var(--color-text);">Rp 0</span>
+            </td>
+            <td style="padding: 6px 4px; text-align: center;">
+                <button type="button" class="btn-icon" onclick="removeItem(${itemIndex})" style="color: var(--color-danger); width: 28px; height: 28px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                 </button>
             </td>
         `;
+        // Hidden fields
+        const saInput = document.createElement('input');
+        saInput.type = 'hidden';
+        saInput.name = `items[${itemIndex}][sa_no]`;
+        saInput.value = data.sa_no || '';
+        row.querySelector('td').appendChild(saInput);
+
+        const satInput = document.createElement('input');
+        satInput.type = 'hidden';
+        satInput.name = `items[${itemIndex}][satuan]`;
+        satInput.value = data.satuan || 'Kg';
+        row.querySelector('td').appendChild(satInput);
 
         tbody.appendChild(row);
-        if (produkId) updateRow(itemIndex);
+        if (data.tonase && data.tarif) calcRow(itemIndex);
         itemIndex++;
     }
 
-    function updateRow(index) {
-        const row = document.getElementById(`item-row-${index}`);
+    function calcRow(idx) {
+        const row = document.getElementById(`item-row-${idx}`);
         if (!row) return;
-
-        const select = row.querySelector('.produk-select');
-        const qtyInput = row.querySelector('.qty-input');
-        const selectedOption = select.options[select.selectedIndex];
-        const harga = parseFloat(selectedOption.dataset.harga) || 0;
-        const qty = parseInt(qtyInput.value) || 0;
-        const subtotal = harga * qty;
-
-        document.getElementById(`harga-${index}`).textContent = formatRupiah(harga);
-        document.getElementById(`subtotal-${index}`).textContent = formatRupiah(subtotal);
-
-        calculateTotal();
+        const tonase = parseFloat(row.querySelector('.tonase-input').value) || 0;
+        const tarif = parseFloat(row.querySelector('.tarif-input').value) || 0;
+        const jumlah = tonase * tarif;
+        document.getElementById(`jumlah-${idx}`).textContent = formatRp(jumlah);
+        calcTotals();
     }
 
-    function removeItem(index) {
-        const row = document.getElementById(`item-row-${index}`);
-        if (row) {
-            row.remove();
-            calculateTotal();
-        }
+    function removeItem(idx) {
+        const row = document.getElementById(`item-row-${idx}`);
+        if (row) { row.remove(); calcTotals(); }
     }
 
-    function calculateTotal() {
-        let total = 0;
+    function calcTotals() {
+        let sub = 0;
         document.querySelectorAll('#itemsBody tr').forEach(row => {
-            const select = row.querySelector('.produk-select');
-            const qtyInput = row.querySelector('.qty-input');
-            if (select && qtyInput) {
-                const harga = parseFloat(select.options[select.selectedIndex]?.dataset?.harga) || 0;
-                const qty = parseInt(qtyInput.value) || 0;
-                total += harga * qty;
-            }
+            const t = parseFloat(row.querySelector('.tonase-input')?.value) || 0;
+            const r = parseFloat(row.querySelector('.tarif-input')?.value) || 0;
+            sub += t * r;
         });
-        document.getElementById('grandTotal').textContent = formatRupiah(total);
+        const dpp = sub * 11 / 12;
+        const ppn = dpp * 0.12;
+        const total = dpp + ppn;
+        document.getElementById('subTotal').textContent = formatRp(sub);
+        document.getElementById('dppTotal').textContent = formatRp(Math.round(dpp));
+        document.getElementById('ppnTotal').textContent = formatRp(Math.round(ppn));
+        document.getElementById('grandTotal').textContent = formatRp(Math.round(total));
     }
 
-    function formatRupiah(amount) {
-        return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount);
-    }
+    function formatRp(n) { return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(n)); }
 
-    // Add first row by default
+    // Start with one row
     addItem();
 </script>
 @endpush

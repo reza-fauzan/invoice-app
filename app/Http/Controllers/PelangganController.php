@@ -47,6 +47,7 @@ class PelangganController extends Controller
             'alamat'         => 'nullable|string',
             'telepon'        => 'nullable|string|max:20',
             'email'          => 'nullable|email|unique:pelanggans,email|max:255',
+            'npwp'           => 'nullable|string|max:30',
         ]);
 
         Pelanggan::create($validated);
@@ -73,6 +74,7 @@ class PelangganController extends Controller
             'alamat'         => 'nullable|string',
             'telepon'        => 'nullable|string|max:20',
             'email'          => 'nullable|email|unique:pelanggans,email,' . $pelanggan->id . '|max:255',
+            'npwp'           => 'nullable|string|max:30',
         ]);
 
         $pelanggan->update($validated);

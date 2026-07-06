@@ -21,7 +21,7 @@
     </div>
 
     {{-- Form --}}
-    <div class="card" style="max-width: 640px;">
+    <div class="card">
         <form action="{{ route('produk.update', $produk) }}" method="POST">
             @csrf
             @method('PUT')
