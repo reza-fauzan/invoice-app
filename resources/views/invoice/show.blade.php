@@ -88,13 +88,15 @@
                     <tr>
                         <th>No</th>
                         <th>Tanggal</th>
-                        <th>No-Pol</th>
+                        <th>No Polisi</th>
                         <th>Penerima</th>
+                        <th>SA NO</th>
                         <th>Srt Jalan</th>
                         <th>Tujuan</th>
                         <th>KET</th>
                         <th>Colly</th>
                         <th>Tonase</th>
+                        <th>Satuan</th>
                         <th>Tarif/Kg</th>
                         <th>Jumlah</th>
                     </tr>
@@ -106,11 +108,21 @@
                             <td>{{ $d->tanggal_kirim->format('d/m/Y') }}</td>
                             <td class="mono">{{ $d->no_pol ?? '-' }}</td>
                             <td>{{ $d->penerima ?? '-' }}</td>
-                            <td class="mono" style="font-size: 11px;">{{ $d->surat_jalan ?? '-' }}</td>
+                            <td class="mono">{{ $d->sa_no ?? '-' }}</td>
+                            <td class="mono" style="font-size: 11px;">
+                                @if($d->surat_jalan)
+                                    @foreach(explode(',', $d->surat_jalan) as $sj)
+                                        <div>{{ trim($sj) }}</div>
+                                    @endforeach
+                                @else
+                                    -
+                                @endif
+                            </td>
                             <td>{{ $d->tujuan ?? '-' }}</td>
                             <td>{{ $d->keterangan ?? '-' }}</td>
                             <td style="text-align: center;">{{ $d->colly ?? '-' }}</td>
-                            <td class="mono">{{ number_format($d->tonase, 2, ',', '.') }} {{ $d->satuan }}</td>
+                            <td class="mono">{{ number_format($d->tonase, 2, ',', '.') }}</td>
+                            <td>{{ $d->satuan ?? 'Kg' }}</td>
                             <td class="mono">Rp {{ number_format($d->tarif, 0, ',', '.') }}</td>
                             <td class="mono" style="font-weight: 600; color: var(--color-text);">Rp {{ number_format($d->jumlah, 0, ',', '.') }}</td>
                         </tr>
@@ -118,19 +130,19 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="10" style="text-align: right; font-weight: 700; padding: 10px 16px;">Sub Total</td>
+                        <td colspan="12" style="text-align: right; font-weight: 700; padding: 10px 16px;">Sub Total</td>
                         <td class="mono" style="font-weight: 700; padding: 10px 16px;">Rp {{ number_format($invoice->sub_total, 0, ',', '.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">DPP (11/12)</td>
+                        <td colspan="12" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">DPP (11/12)</td>
                         <td class="mono" style="font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">Rp {{ number_format($invoice->dpp, 0, ',', '.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">PPN 12% dari DPP</td>
+                        <td colspan="12" style="text-align: right; font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">PPN 12% dari DPP</td>
                         <td class="mono" style="font-size: 13px; color: var(--color-text-secondary); padding: 6px 16px;">Rp {{ number_format($invoice->ppn, 0, ',', '.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10" style="text-align: right; font-weight: 700; font-size: 16px; color: var(--color-primary); padding: 12px 16px; border-top: 2px solid var(--color-border);">Total</td>
+                        <td colspan="12" style="text-align: right; font-weight: 700; font-size: 16px; color: var(--color-primary); padding: 12px 16px; border-top: 2px solid var(--color-border);">Total</td>
                         <td class="mono" style="font-weight: 700; font-size: 16px; color: var(--color-primary); padding: 12px 16px; border-top: 2px solid var(--color-border);">Rp {{ number_format($invoice->total_tagihan, 0, ',', '.') }}</td>
                     </tr>
                 </tfoot>

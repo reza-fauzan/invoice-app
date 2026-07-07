@@ -236,7 +236,13 @@
                         <td>{{ $d->no_pol ?? '' }}</td>
                         <td>{{ $d->penerima ?? '' }}</td>
                         <td>{{ $d->sa_no ?? '' }}</td>
-                        <td style="font-size: 8px;">{{ $d->surat_jalan ?? '' }}</td>
+                        <td style="font-size: 8px;">
+                            @if($d->surat_jalan)
+                                @foreach(explode(',', $d->surat_jalan) as $sj)
+                                    {{ trim($sj) }}@if(!$loop->last)<br>@endif
+                                @endforeach
+                            @endif
+                        </td>
                         <td>{{ $d->tujuan ?? '' }}</td>
                         <td class="center">{{ $d->keterangan ?? '' }}</td>
                         <td class="center">{{ $d->colly ?? '' }}</td>

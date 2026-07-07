@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\Kendaraan;
 use App\Models\Pelanggan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +43,9 @@ class InvoiceController extends Controller
     public function create()
     {
         $pelanggans = Pelanggan::orderBy('nama_pelanggan')->get();
+        $kendaraans = Kendaraan::where('status', 'Aktif')->orderBy('no_pol')->get();
 
-        return view('invoice.create', compact('pelanggans'));
+        return view('invoice.create', compact('pelanggans', 'kendaraans'));
     }
 
     /**
@@ -62,22 +64,23 @@ class InvoiceController extends Controller
             'items.*.no_pol'      => 'nullable|string|max:20',
             'items.*.penerima'    => 'nullable|string|max:255',
             'items.*.sa_no'       => 'nullable|string|max:50',
-            'items.*.surat_jalan' => 'nullable|string',
+            'items.*.surat_jalan' => 'nullable|array',
+            'items.*.surat_jalan.*' => 'nullable|string|max:100',
             'items.*.tujuan'      => 'nullable|string|max:100',
             'items.*.keterangan'  => 'nullable|string|max:100',
             'items.*.colly'       => 'nullable|integer|min:0',
             'items.*.tonase'      => 'required|numeric|min:0',
             'items.*.satuan'      => 'nullable|string|max:20',
             'items.*.tarif'       => 'required|numeric|min:0',
+            'items.*.jumlah'      => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated, $request) {
             $subTotal = 0;
 
-            // Hitung sub total
+            // Hitung sub total dari jumlah yang diinput manual
             foreach ($request->items as $item) {
-                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
-                $subTotal += $jumlah;
+                $subTotal += ($item['jumlah'] ?? 0);
             }
 
             // Hitung DPP dan PPN
@@ -98,7 +101,12 @@ class InvoiceController extends Controller
             ]);
 
             foreach ($request->items as $item) {
-                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
+                // Gabungkan array surat_jalan menjadi string dipisahkan koma
+                $suratJalan = null;
+                if (!empty($item['surat_jalan']) && is_array($item['surat_jalan'])) {
+                    $filtered = array_filter($item['surat_jalan'], fn($v) => $v !== null && $v !== '');
+                    $suratJalan = !empty($filtered) ? implode(', ', $filtered) : null;
+                }
 
                 InvoiceDetail::create([
                     'invoice_id'    => $invoice->id,
@@ -106,14 +114,14 @@ class InvoiceController extends Controller
                     'no_pol'        => $item['no_pol'] ?? null,
                     'penerima'      => $item['penerima'] ?? null,
                     'sa_no'         => $item['sa_no'] ?? null,
-                    'surat_jalan'   => $item['surat_jalan'] ?? null,
+                    'surat_jalan'   => $suratJalan,
                     'tujuan'        => $item['tujuan'] ?? null,
                     'keterangan'    => $item['keterangan'] ?? null,
                     'colly'         => $item['colly'] ?? null,
                     'tonase'        => $item['tonase'] ?? 0,
                     'satuan'        => $item['satuan'] ?? 'Kg',
                     'tarif'         => $item['tarif'] ?? 0,
-                    'jumlah'        => $jumlah,
+                    'jumlah'        => $item['jumlah'] ?? 0,
                 ]);
             }
         });
@@ -139,8 +147,9 @@ class InvoiceController extends Controller
     {
         $invoice->load('invoiceDetails');
         $pelanggans = Pelanggan::orderBy('nama_pelanggan')->get();
+        $kendaraans = Kendaraan::where('status', 'Aktif')->orderBy('no_pol')->get();
 
-        return view('invoice.edit', compact('invoice', 'pelanggans'));
+        return view('invoice.edit', compact('invoice', 'pelanggans', 'kendaraans'));
     }
 
     /**
@@ -159,21 +168,22 @@ class InvoiceController extends Controller
             'items.*.no_pol'      => 'nullable|string|max:20',
             'items.*.penerima'    => 'nullable|string|max:255',
             'items.*.sa_no'       => 'nullable|string|max:50',
-            'items.*.surat_jalan' => 'nullable|string',
+            'items.*.surat_jalan' => 'nullable|array',
+            'items.*.surat_jalan.*' => 'nullable|string|max:100',
             'items.*.tujuan'      => 'nullable|string|max:100',
             'items.*.keterangan'  => 'nullable|string|max:100',
             'items.*.colly'       => 'nullable|integer|min:0',
             'items.*.tonase'      => 'required|numeric|min:0',
             'items.*.satuan'      => 'nullable|string|max:20',
             'items.*.tarif'       => 'required|numeric|min:0',
+            'items.*.jumlah'      => 'required|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($validated, $request, $invoice) {
             $subTotal = 0;
 
             foreach ($request->items as $item) {
-                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
-                $subTotal += $jumlah;
+                $subTotal += ($item['jumlah'] ?? 0);
             }
 
             $dpp = $subTotal * 11 / 12;
@@ -194,7 +204,12 @@ class InvoiceController extends Controller
             $invoice->invoiceDetails()->delete();
 
             foreach ($request->items as $item) {
-                $jumlah = ($item['tonase'] ?? 0) * ($item['tarif'] ?? 0);
+                // Gabungkan array surat_jalan menjadi string dipisahkan koma
+                $suratJalan = null;
+                if (!empty($item['surat_jalan']) && is_array($item['surat_jalan'])) {
+                    $filtered = array_filter($item['surat_jalan'], fn($v) => $v !== null && $v !== '');
+                    $suratJalan = !empty($filtered) ? implode(', ', $filtered) : null;
+                }
 
                 InvoiceDetail::create([
                     'invoice_id'    => $invoice->id,
@@ -202,14 +217,14 @@ class InvoiceController extends Controller
                     'no_pol'        => $item['no_pol'] ?? null,
                     'penerima'      => $item['penerima'] ?? null,
                     'sa_no'         => $item['sa_no'] ?? null,
-                    'surat_jalan'   => $item['surat_jalan'] ?? null,
+                    'surat_jalan'   => $suratJalan,
                     'tujuan'        => $item['tujuan'] ?? null,
                     'keterangan'    => $item['keterangan'] ?? null,
                     'colly'         => $item['colly'] ?? null,
                     'tonase'        => $item['tonase'] ?? 0,
                     'satuan'        => $item['satuan'] ?? 'Kg',
                     'tarif'         => $item['tarif'] ?? 0,
-                    'jumlah'        => $jumlah,
+                    'jumlah'        => $item['jumlah'] ?? 0,
                 ]);
             }
         });
