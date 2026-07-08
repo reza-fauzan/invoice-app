@@ -3,14 +3,19 @@
 @section('title', 'Kendaraan')
 
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Kendaraan</h1>
-            <p>Kelola data kendaraan dan driver.</p>
+
+    {{-- Status Filter & Actions Row --}}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        {{-- Filters (Left) --}}
+        <div style="display: flex; gap: 8px;">
+            <a href="{{ route('kendaraan.index') }}" class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-secondary' }}">Semua</a>
+            <a href="{{ route('kendaraan.index', ['status' => 'Aktif']) }}" class="btn btn-sm {{ request('status') == 'Aktif' ? 'btn-primary' : 'btn-secondary' }}">Aktif</a>
+            <a href="{{ route('kendaraan.index', ['status' => 'Nonaktif']) }}" class="btn btn-sm {{ request('status') == 'Nonaktif' ? 'btn-primary' : 'btn-secondary' }}">Nonaktif</a>
         </div>
-        <div class="page-header-actions">
-            <a href="{{ route('kendaraan.create') }}" class="btn btn-primary btn-sm">
+
+        {{-- Action Button (Right) --}}
+        <div>
+            <a href="{{ route('kendaraan.create') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px; height: 34px; line-height: 1;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -18,13 +23,6 @@
                 Tambah Kendaraan
             </a>
         </div>
-    </div>
-
-    {{-- Status Filter --}}
-    <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
-        <a href="{{ route('kendaraan.index') }}" class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-secondary' }}">Semua</a>
-        <a href="{{ route('kendaraan.index', ['status' => 'Aktif']) }}" class="btn btn-sm {{ request('status') == 'Aktif' ? 'btn-primary' : 'btn-secondary' }}">Aktif</a>
-        <a href="{{ route('kendaraan.index', ['status' => 'Nonaktif']) }}" class="btn btn-sm {{ request('status') == 'Nonaktif' ? 'btn-primary' : 'btn-secondary' }}">Nonaktif</a>
     </div>
 
     {{-- Table --}}
@@ -35,7 +33,7 @@
                 <p class="table-header-sub">Total: {{ $kendaraans->total() }} kendaraan</p>
             </div>
             <div class="table-actions">
-                <form action="{{ route('kendaraan.index') }}" method="GET" style="display: flex; align-items: center;">
+                <form action="{{ route('kendaraan.index') }}" method="GET" style="display: flex; align-items: center; margin: 0;">
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
@@ -44,7 +42,7 @@
                             <circle cx="11" cy="11" r="8"/>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                         </svg>
-                        <input type="text" name="search" class="form-input" placeholder="Cari no pol, jenis, driver..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 240px;">
+                        <input type="text" name="search" class="form-input" placeholder="Cari no pol, jenis, driver..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 240px; height: 34px;">
                     </div>
                 </form>
             </div>

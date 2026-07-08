@@ -3,14 +3,20 @@
 @section('title', 'Pembayaran')
 
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Pembayaran</h1>
-            <p>Kelola semua catatan pembayaran.</p>
+
+    {{-- Status Filter & Actions Row --}}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        {{-- Filters (Left) --}}
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <a href="{{ route('pembayaran.index') }}" class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-secondary' }}">Semua</a>
+            <a href="{{ route('pembayaran.index', ['status' => 'Pending']) }}" class="btn btn-sm {{ request('status') == 'Pending' ? 'btn-primary' : 'btn-secondary' }}">Pending</a>
+            <a href="{{ route('pembayaran.index', ['status' => 'Verified']) }}" class="btn btn-sm {{ request('status') == 'Verified' ? 'btn-primary' : 'btn-secondary' }}">Verified</a>
+            <a href="{{ route('pembayaran.index', ['status' => 'Rejected']) }}" class="btn btn-sm {{ request('status') == 'Rejected' ? 'btn-primary' : 'btn-secondary' }}">Rejected</a>
         </div>
-        <div class="page-header-actions">
-            <a href="{{ route('pembayaran.create') }}" class="btn btn-primary btn-sm">
+
+        {{-- Action Button (Right) --}}
+        <div>
+            <a href="{{ route('pembayaran.create') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px; height: 34px; line-height: 1;">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -18,14 +24,6 @@
                 Catat Pembayaran
             </a>
         </div>
-    </div>
-
-    {{-- Status Filter --}}
-    <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
-        <a href="{{ route('pembayaran.index') }}" class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-secondary' }}">Semua</a>
-        <a href="{{ route('pembayaran.index', ['status' => 'Pending']) }}" class="btn btn-sm {{ request('status') == 'Pending' ? 'btn-primary' : 'btn-secondary' }}">Pending</a>
-        <a href="{{ route('pembayaran.index', ['status' => 'Verified']) }}" class="btn btn-sm {{ request('status') == 'Verified' ? 'btn-primary' : 'btn-secondary' }}">Verified</a>
-        <a href="{{ route('pembayaran.index', ['status' => 'Rejected']) }}" class="btn btn-sm {{ request('status') == 'Rejected' ? 'btn-primary' : 'btn-secondary' }}">Rejected</a>
     </div>
 
     {{-- Table --}}
@@ -36,7 +34,7 @@
                 <p class="table-header-sub">Total: {{ $pembayarans->total() }} pembayaran</p>
             </div>
             <div class="table-actions">
-                <form action="{{ route('pembayaran.index') }}" method="GET" style="display: flex; align-items: center;">
+                <form action="{{ route('pembayaran.index') }}" method="GET" style="display: flex; align-items: center; margin: 0;">
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
@@ -45,7 +43,7 @@
                             <circle cx="11" cy="11" r="8"/>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                         </svg>
-                        <input type="text" name="search" class="form-input" placeholder="Cari invoice atau pelanggan..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 260px;">
+                        <input type="text" name="search" class="form-input" placeholder="Cari invoice atau pelanggan..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 260px; height: 34px;">
                     </div>
                 </form>
             </div>

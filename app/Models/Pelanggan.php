@@ -19,6 +19,18 @@ class Pelanggan extends Model
     ];
 
     /**
+     * Format nomor telepon untuk WhatsApp (mengubah awal 0 menjadi 62).
+     */
+    public function getWhatsappNumberAttribute()
+    {
+        $phone = preg_replace('/[^0-9]/', '', $this->telepon);
+        if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+        }
+        return $phone;
+    }
+
+    /**
      * Pelanggan memiliki banyak Invoice.
      */
     public function invoices(): HasMany

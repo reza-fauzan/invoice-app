@@ -3,23 +3,6 @@
 @section('title', 'Produk')
 
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Produk</h1>
-            <p>Kelola data produk dan layanan Anda.</p>
-        </div>
-        <div class="page-header-actions">
-            <a href="{{ route('produk.create') }}" class="btn btn-primary btn-sm">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Tambah Produk
-            </a>
-        </div>
-    </div>
-
     {{-- Table --}}
     <div class="table-container">
         <div class="table-header">
@@ -27,16 +10,24 @@
                 <h3>Daftar Produk</h3>
                 <p class="table-header-sub">Total: {{ $produks->total() }} produk</p>
             </div>
-            <div class="table-actions">
-                <form action="{{ route('produk.index') }}" method="GET" style="display: flex; align-items: center;">
+            <div class="table-actions" style="display: flex; align-items: center; gap: 12px;">
+                <form action="{{ route('produk.index') }}" method="GET" style="display: flex; align-items: center; margin: 0;">
                     <div class="search-inline">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="11" cy="11" r="8"/>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                         </svg>
-                        <input type="text" name="search" class="form-input" placeholder="Cari produk..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 220px;">
+                        <input type="text" name="search" class="form-input" placeholder="Cari produk..." value="{{ request('search') }}" style="padding: 7px 12px 7px 34px; font-size: 13px; min-width: 220px; height: 34px;">
                     </div>
                 </form>
+
+                <a href="{{ route('produk.create') }}" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px; height: 34px; line-height: 1;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Tambah Produk
+                </a>
             </div>
         </div>
 

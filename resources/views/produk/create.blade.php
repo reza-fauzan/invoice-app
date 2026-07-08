@@ -2,23 +2,17 @@
 
 @section('title', 'Tambah Produk')
 
+@section('page-actions')
+    <a href="{{ route('produk.index') }}" class="btn btn-secondary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Kembali
+    </a>
+@endsection
+
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Tambah Produk</h1>
-            <p>Isi form di bawah untuk menambahkan produk baru.</p>
-        </div>
-        <div class="page-header-actions">
-            <a href="{{ route('produk.index') }}" class="btn btn-secondary btn-sm">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Kembali
-            </a>
-        </div>
-    </div>
 
     {{-- Form --}}
     <div class="card">

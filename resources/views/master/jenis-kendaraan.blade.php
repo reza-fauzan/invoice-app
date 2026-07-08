@@ -3,27 +3,20 @@
 @section('title', 'Jenis Kendaraan')
 
 @section('content')
-    <div class="page-header">
-        <div>
-            <h1>Jenis Kendaraan</h1>
-            <p>Kelola master data jenis kendaraan.</p>
-        </div>
-        <div class="page-header-actions">
-            <button type="button" class="btn btn-primary btn-sm" onclick="openModal('create')">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"/>
-                    <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Tambah Jenis
-            </button>
-        </div>
-    </div>
-
     <div class="table-container">
         <div class="table-header">
             <div>
                 <h3>Daftar Jenis Kendaraan</h3>
                 <p class="table-header-sub">Total: {{ $items->count() }} jenis</p>
+            </div>
+            <div class="table-actions">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openModal('create')" style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 13px; height: 34px; line-height: 1;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    Tambah Jenis
+                </button>
             </div>
         </div>
         <table>

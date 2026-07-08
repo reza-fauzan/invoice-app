@@ -29,7 +29,13 @@ class InvoiceController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status_pembayaran', $request->status);
+            if ($request->status === 'Overdue') {
+                $query->where('status_pembayaran', 'Unpaid')
+                      ->whereNotNull('tanggal_jatuh_tempo')
+                      ->where('tanggal_jatuh_tempo', '<', now()->toDateString());
+            } else {
+                $query->where('status_pembayaran', $request->status);
+            }
         }
 
         $invoices = $query->latest()->paginate(10)->withQueryString();
@@ -58,7 +64,6 @@ class InvoiceController extends Controller
             'nomor_invoice'       => 'required|string|max:50|unique:invoices,nomor_invoice',
             'tanggal_invoice'     => 'required|date',
             'tanggal_jatuh_tempo' => 'nullable|date',
-            'status_pembayaran'   => 'required|in:Draft,Unpaid,Paid,Canceled',
             'items'               => 'required|array|min:1',
             'items.*.tanggal_kirim' => 'required|date',
             'items.*.no_pol'      => 'nullable|string|max:20',
@@ -71,7 +76,7 @@ class InvoiceController extends Controller
             'items.*.colly'       => 'nullable|integer|min:0',
             'items.*.tonase'      => 'required|numeric|min:0',
             'items.*.satuan'      => 'nullable|string|max:20',
-            'items.*.tarif'       => 'required|numeric|min:0',
+            'items.*.tarif'       => 'nullable|numeric|min:0',
             'items.*.jumlah'      => 'required|numeric|min:0',
         ]);
 
@@ -93,7 +98,7 @@ class InvoiceController extends Controller
                 'nomor_invoice'       => $validated['nomor_invoice'],
                 'tanggal_invoice'     => $validated['tanggal_invoice'],
                 'tanggal_jatuh_tempo' => $validated['tanggal_jatuh_tempo'] ?? null,
-                'status_pembayaran'   => $validated['status_pembayaran'],
+                'status_pembayaran'   => 'Unpaid',
                 'sub_total'           => $subTotal,
                 'dpp'                 => round($dpp),
                 'ppn'                 => round($ppn),
@@ -162,7 +167,6 @@ class InvoiceController extends Controller
             'nomor_invoice'       => 'required|string|max:50|unique:invoices,nomor_invoice,' . $invoice->id,
             'tanggal_invoice'     => 'required|date',
             'tanggal_jatuh_tempo' => 'nullable|date',
-            'status_pembayaran'   => 'required|in:Draft,Unpaid,Paid,Canceled',
             'items'               => 'required|array|min:1',
             'items.*.tanggal_kirim' => 'required|date',
             'items.*.no_pol'      => 'nullable|string|max:20',
@@ -175,7 +179,7 @@ class InvoiceController extends Controller
             'items.*.colly'       => 'nullable|integer|min:0',
             'items.*.tonase'      => 'required|numeric|min:0',
             'items.*.satuan'      => 'nullable|string|max:20',
-            'items.*.tarif'       => 'required|numeric|min:0',
+            'items.*.tarif'       => 'nullable|numeric|min:0',
             'items.*.jumlah'      => 'required|numeric|min:0',
         ]);
 
@@ -194,7 +198,7 @@ class InvoiceController extends Controller
                 'nomor_invoice'       => $validated['nomor_invoice'],
                 'tanggal_invoice'     => $validated['tanggal_invoice'],
                 'tanggal_jatuh_tempo' => $validated['tanggal_jatuh_tempo'] ?? null,
-                'status_pembayaran'   => $validated['status_pembayaran'],
+                'status_pembayaran'   => $invoice->pembayarans()->exists() ? 'Paid' : 'Unpaid',
                 'sub_total'           => $subTotal,
                 'dpp'                 => round($dpp),
                 'ppn'                 => round($ppn),

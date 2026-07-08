@@ -7,7 +7,7 @@
     <style>
         @page {
             size: A4 landscape;
-            margin: 10mm;
+            margin: 0;
         }
         * {
             margin: 0;
@@ -19,6 +19,7 @@
             font-size: 10px;
             line-height: 1.4;
             color: #000;
+            padding: 10mm;
         }
         .invoice-container {
             width: 100%;

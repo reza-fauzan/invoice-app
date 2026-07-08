@@ -2,23 +2,17 @@
 
 @section('title', 'Buat Invoice')
 
+@section('page-actions')
+    <a href="{{ route('invoice.index') }}" class="btn btn-secondary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Kembali
+    </a>
+@endsection
+
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Buat Invoice</h1>
-            <p>Buat invoice pengiriman baru.</p>
-        </div>
-        <div class="page-header-actions">
-            <a href="{{ route('invoice.index') }}" class="btn btn-secondary btn-sm">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Kembali
-            </a>
-        </div>
-    </div>
 
     <form action="{{ route('invoice.store') }}" method="POST" id="invoiceForm">
         @csrf
@@ -54,7 +48,7 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
                 {{-- Tanggal --}}
                 <div>
                     <label for="tanggal_invoice" class="form-label">Tanggal Invoice <span style="color: var(--color-danger);">*</span></label>
@@ -69,19 +63,6 @@
                     <label for="tanggal_jatuh_tempo" class="form-label">Tgl Jatuh Tempo</label>
                     <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo" class="form-input" value="{{ old('tanggal_jatuh_tempo') }}">
                     @error('tanggal_jatuh_tempo')
-                        <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Status --}}
-                <div>
-                    <label for="status_pembayaran" class="form-label">Status <span style="color: var(--color-danger);">*</span></label>
-                    <select name="status_pembayaran" id="status_pembayaran" class="form-input" required>
-                        <option value="Draft" {{ old('status_pembayaran') == 'Draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="Unpaid" {{ old('status_pembayaran', 'Unpaid') == 'Unpaid' ? 'selected' : '' }}>Unpaid</option>
-                        <option value="Paid" {{ old('status_pembayaran') == 'Paid' ? 'selected' : '' }}>Paid</option>
-                    </select>
-                    @error('status_pembayaran')
                         <p style="color: var(--color-danger); font-size: 13px; margin-top: 4px;">{{ $message }}</p>
                     @enderror
                 </div>
@@ -245,7 +226,7 @@
                 </select>
             </td>
             <td style="padding: 6px 4px;">
-                <input type="number" name="items[${itemIndex}][tarif]" class="form-input tarif-input" value="${data.tarif || ''}" step="0.01" min="0" required style="${inputStyle} font-family: var(--font-mono); text-align: right;">
+                <input type="number" name="items[${itemIndex}][tarif]" class="form-input tarif-input" value="${data.tarif || ''}" step="0.01" min="0" style="${inputStyle} font-family: var(--font-mono); text-align: right;">
             </td>
             <td style="padding: 6px 4px;">
                 <input type="number" name="items[${itemIndex}][jumlah]" class="form-input jumlah-input" value="${data.jumlah || ''}" step="0.01" min="0" required onchange="calcTotals()" oninput="calcTotals()" style="${inputStyle} font-family: var(--font-mono); text-align: right; font-weight: 600;">

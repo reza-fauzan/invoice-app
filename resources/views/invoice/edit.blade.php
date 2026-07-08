@@ -2,23 +2,17 @@
 
 @section('title', 'Edit Invoice')
 
+@section('page-actions')
+    <a href="{{ route('invoice.show', $invoice) }}" class="btn btn-secondary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Kembali
+    </a>
+@endsection
+
 @section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Edit Invoice</h1>
-            <p>Ubah data invoice <strong>{{ $invoice->nomor_invoice }}</strong>.</p>
-        </div>
-        <div class="page-header-actions">
-            <a href="{{ route('invoice.show', $invoice) }}" class="btn btn-secondary btn-sm">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="19" y1="12" x2="5" y2="12"/>
-                    <polyline points="12 19 5 12 12 5"/>
-                </svg>
-                Kembali
-            </a>
-        </div>
-    </div>
 
     <form action="{{ route('invoice.update', $invoice) }}" method="POST" id="invoiceForm">
         @csrf
@@ -53,7 +47,7 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
                 <div>
                     <label for="tanggal_invoice" class="form-label">Tanggal Invoice <span style="color: var(--color-danger);">*</span></label>
                     <input type="date" name="tanggal_invoice" id="tanggal_invoice" class="form-input" value="{{ old('tanggal_invoice', $invoice->tanggal_invoice->format('Y-m-d')) }}" required>
@@ -61,14 +55,6 @@
                 <div>
                     <label for="tanggal_jatuh_tempo" class="form-label">Tgl Jatuh Tempo</label>
                     <input type="date" name="tanggal_jatuh_tempo" id="tanggal_jatuh_tempo" class="form-input" value="{{ old('tanggal_jatuh_tempo', $invoice->tanggal_jatuh_tempo?->format('Y-m-d')) }}">
-                </div>
-                <div>
-                    <label for="status_pembayaran" class="form-label">Status <span style="color: var(--color-danger);">*</span></label>
-                    <select name="status_pembayaran" id="status_pembayaran" class="form-input" required>
-                        @foreach(['Draft','Unpaid','Paid','Canceled'] as $st)
-                            <option value="{{ $st }}" {{ old('status_pembayaran', $invoice->status_pembayaran) == $st ? 'selected' : '' }}>{{ $st }}</option>
-                        @endforeach
-                    </select>
                 </div>
             </div>
         </div>
@@ -216,7 +202,7 @@
                     <option value="Set" ${data.satuan === 'Set' ? 'selected' : ''}>Set</option>
                 </select>
             </td>
-            <td style="padding: 6px 4px;"><input type="number" name="items[${itemIndex}][tarif]" class="form-input tarif-input" value="${data.tarif || ''}" step="0.01" min="0" required style="${inputStyle} font-family: var(--font-mono); text-align: right;"></td>
+            <td style="padding: 6px 4px;"><input type="number" name="items[${itemIndex}][tarif]" class="form-input tarif-input" value="${data.tarif || ''}" step="0.01" min="0" style="${inputStyle} font-family: var(--font-mono); text-align: right;"></td>
             <td style="padding: 6px 4px;"><input type="number" name="items[${itemIndex}][jumlah]" class="form-input jumlah-input" value="${data.jumlah || ''}" step="0.01" min="0" required onchange="calcTotals()" oninput="calcTotals()" style="${inputStyle} font-family: var(--font-mono); text-align: right; font-weight: 600;"></td>
             <td style="padding: 6px 4px; text-align: center;">
                 <button type="button" class="btn-icon" onclick="removeItem(${itemIndex})" style="color: var(--color-danger); width: 28px; height: 28px;">

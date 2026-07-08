@@ -52,6 +52,17 @@ class Invoice extends Model
     }
 
     /**
+     * Update status pembayaran berdasarkan ada/tidaknya riwayat pembayaran.
+     */
+    public function updateStatusPembayaran()
+    {
+        $hasPayment = $this->pembayarans()->exists();
+        $this->update([
+            'status_pembayaran' => $hasPayment ? 'Paid' : 'Unpaid'
+        ]);
+    }
+
+    /**
      * Invoice memiliki banyak Pembayaran.
      */
     public function pembayarans(): HasMany

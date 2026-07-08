@@ -138,6 +138,35 @@ body {
     flex-shrink: 0;
 }
 
+/* Sidebar Dropdown Menu */
+.nav-dropdown {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-dropdown-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between !important;
+}
+
+.nav-dropdown-items {
+    display: none;
+}
+
+.nav-dropdown.open .nav-dropdown-items {
+    display: block;
+}
+
+.nav-dropdown.open .chevron {
+    transform: rotate(90deg);
+}
+
 .sidebar-footer {
     padding: 16px;
 }

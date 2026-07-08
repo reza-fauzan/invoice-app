@@ -2,14 +2,27 @@
 
 @section('title', 'Detail Invoice')
 
-@section('content')
-    {{-- Page Header --}}
-    <div class="page-header">
-        <div>
-            <h1>Invoice {{ $invoice->nomor_invoice }}</h1>
-            <p>Detail invoice pengiriman.</p>
-        </div>
-        <div class="page-header-actions" style="display: flex; gap: 8px;">
+@section('page-actions')
+            @if($invoice->status_pembayaran === 'Unpaid')
+                @php
+                    $waMessage = "Halo *" . $invoice->pelanggan->nama_pelanggan . "*,\n\n" .
+                                 "Kami ingin mengingatkan mengenai tagihan Invoice *" . $invoice->nomor_invoice . "* sebesar *Rp " . number_format($invoice->total_tagihan, 0, ',', '.') . "* yang jatuh tempo pada *" . ($invoice->tanggal_jatuh_tempo ? $invoice->tanggal_jatuh_tempo->format('d/m/Y') : '-') . "*.\n\n" .
+                                 "Mohon untuk segera melakukan pembayaran ke rekening berikut:\n" .
+                                 "Bank: *BCA*\n" .
+                                 "No. Rekening: *7210223988*\n" .
+                                 "Atas Nama: *CV Sumber Jaya Makmur*\n\n" .
+                                 "Jika Anda sudah melakukan pembayaran, mohon abaikan pesan ini atau kirimkan bukti pembayaran kepada kami.\n\n" .
+                                 "Terima kasih atas kerja samanya.\n" .
+                                 "*CV. SUMBER JAYA MAKMUR*";
+                    $waUrl = "https://wa.me/" . $invoice->pelanggan->whatsapp_number . "?text=" . urlencode($waMessage);
+                @endphp
+                <a href="{{ $waUrl }}" target="_blank" class="btn btn-sm" style="background-color: #25D366; color: #fff; box-shadow: 0 2px 8px rgba(37, 211, 102, 0.25);">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                    </svg>
+                    Kirim WA
+                </a>
+            @endif
             <a href="{{ route('invoice.print', $invoice) }}" target="_blank" class="btn btn-secondary btn-sm">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"/>
@@ -32,8 +45,27 @@
                 </svg>
                 Kembali
             </a>
+@endsection
+
+@section('content')
+
+    @php
+        $isOverdue = $invoice->status_pembayaran === 'Unpaid' && $invoice->tanggal_jatuh_tempo && $invoice->tanggal_jatuh_tempo->lt(now()->startOfDay());
+    @endphp
+
+    @if($isOverdue)
+        <div class="alert alert-danger animate-fade-in" style="margin-bottom: 24px; border-left: 4px solid var(--color-danger); display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-danger); flex-shrink: 0;">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <div>
+                <strong style="color: var(--color-text); font-weight: 700;">Invoice Terlambat Bayar!</strong>
+                <span style="color: var(--color-text-secondary); margin-left: 4px;">Tanggal jatuh tempo ({{ $invoice->tanggal_jatuh_tempo->format('d/m/Y') }}) telah lewat. Silakan hubungi pelanggan untuk melakukan penagihan.</span>
+            </div>
         </div>
-    </div>
+    @endif
 
     {{-- Invoice Info --}}
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
