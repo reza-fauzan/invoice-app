@@ -65,6 +65,18 @@
                 Pelanggan
             </a>
 
+            @if(auth()->check() && auth()->user()->role === 'admin')
+            <a href="{{ url('/karyawan') }}" class="nav-item {{ request()->is('karyawan*') ? 'active' : '' }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M12 21v-2a4 4 0 0 0-4-4H4a4 4 0 0 0-4 4v2"/>
+                </svg>
+                Manajemen Karyawan
+            </a>
+            @endif
+
+
             <div class="nav-dropdown {{ request()->is('kendaraan*', 'jenis-kendaraan*', 'merk-kendaraan*') ? 'open' : '' }}" id="kendaraanDropdown">
                 <button type="button" class="nav-item nav-dropdown-trigger {{ request()->is('kendaraan*', 'jenis-kendaraan*', 'merk-kendaraan*') ? 'active' : '' }}" onclick="toggleSidebarDropdown('kendaraanDropdown')">
                     <span style="display: flex; align-items: center; gap: 10px;">
@@ -130,14 +142,17 @@
 
         {{-- Footer --}}
         <div class="sidebar-footer">
-            <a href="#" class="upgrade-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                    <polyline points="16 17 21 12 16 7"/>
-                    <line x1="21" y1="12" x2="9" y2="12"/>
-                </svg>
-                Logout
-            </a>
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
+                @csrf
+                <button type="submit" class="upgrade-btn" style="width: 100%; border: none; cursor: pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Logout
+                </button>
+            </form>
         </div>
     </aside>
 
