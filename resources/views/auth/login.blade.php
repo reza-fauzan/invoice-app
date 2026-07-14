@@ -30,10 +30,11 @@
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 flex items-center justify-center relative overflow-hidden">
-    <!-- Animated Background Blobs -->
-    <div class="blob bg-blue-400 w-96 h-96 rounded-full top-[-10%] left-[-10%] mix-blend-multiply animate-blob"></div>
-    <div class="blob bg-purple-400 w-96 h-96 rounded-full bottom-[-10%] right-[-10%] mix-blend-multiply animate-blob animation-delay-2000"></div>
-    <div class="blob bg-pink-400 w-96 h-96 rounded-full top-[20%] right-[20%] mix-blend-multiply animate-blob animation-delay-4000"></div>
+    <!-- Video Background -->
+    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0 pointer-events-none">
+        <source src="{{ asset('assets/background-video.mp4') }}" type="video/mp4">
+    </video>
+    <div class="absolute top-0 left-0 w-full h-full bg-slate-900/40 backdrop-blur-sm z-0"></div>
 
     <div class="w-full max-w-[1000px] flex rounded-[2rem] shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] overflow-hidden m-4 relative z-10 bg-white">
         
@@ -56,15 +57,7 @@
             </div>
             
             <div class="relative z-10">
-                <div class="flex items-center gap-4">
-                    <div class="flex -space-x-3">
-                        <div class="w-10 h-10 rounded-full border-2 border-slate-800 bg-blue-500 flex items-center justify-center text-xs font-bold">1k+</div>
-                        <div class="w-10 h-10 rounded-full border-2 border-slate-800 bg-purple-500 flex items-center justify-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        </div>
-                    </div>
-                    <p class="text-sm font-medium text-slate-300">Bergabung dengan pengguna lainnya</p>
-                </div>
+                <p class="text-sm font-medium text-slate-400">&copy; {{ date('Y') }} InvoiceApp. All rights reserved.</p>
             </div>
             
             <!-- Decorative circles -->
@@ -79,6 +72,15 @@
                     <h2 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang 👋</h2>
                     <p class="text-slate-500 font-medium">Silakan masuk untuk melanjutkan ke dashboard.</p>
                 </div>
+
+                @if (session('success'))
+                    <div class="bg-green-50/80 border border-green-100 text-green-700 px-5 py-4 rounded-xl mb-8 text-sm backdrop-blur-sm flex items-start gap-3 shadow-sm">
+                        <svg class="w-5 h-5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div>
+                            <span class="font-semibold block">{{ session('success') }}</span>
+                        </div>
+                    </div>
+                @endif
 
                 @if ($errors->any())
                     <div class="bg-red-50/80 border border-red-100 text-red-600 px-5 py-4 rounded-xl mb-8 text-sm backdrop-blur-sm flex items-start gap-3 shadow-sm">
@@ -133,7 +135,7 @@
                             </div>
                             <span class="text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">Ingat saya</span>
                         </label>
-                        <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">Lupa password?</a>
+                        <a href="{{ route('password.request') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">Lupa password?</a>
                     </div>
 
                     <button type="submit"

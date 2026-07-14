@@ -59,9 +59,7 @@ class AuthController extends Controller
             'role' => 'admin', // default to admin because this is initial setup
         ]);
 
-        Auth::login($user);
-
-        return redirect('/dashboard');
+        return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan login.');
     }
 
     public function logout(Request $request)
