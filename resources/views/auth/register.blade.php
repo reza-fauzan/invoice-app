@@ -24,9 +24,11 @@
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 flex items-center justify-center relative overflow-hidden p-4">
-    <!-- Animated Background Blobs -->
-    <div class="blob bg-blue-400 w-96 h-96 rounded-full bottom-[-10%] left-[-10%] mix-blend-multiply"></div>
-    <div class="blob bg-purple-400 w-96 h-96 rounded-full top-[-10%] right-[-10%] mix-blend-multiply"></div>
+    <!-- Video Background -->
+    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0 pointer-events-none">
+        <source src="{{ asset('assets/background-video.mp4') }}" type="video/mp4">
+    </video>
+    <div class="absolute top-0 left-0 w-full h-full bg-slate-900/40 backdrop-blur-sm z-0"></div>
 
     <div class="w-full max-w-[1000px] flex flex-row-reverse rounded-[2rem] shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] overflow-hidden relative z-10 bg-white">
         
@@ -114,8 +116,12 @@
                                     </svg>
                                 </div>
                                 <input type="password" id="password" name="password" required
-                                    class="block w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-sm placeholder:text-slate-400"
+                                    class="block w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-sm placeholder:text-slate-400"
                                     placeholder="••••••••">
+                                <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors" data-target="password">
+                                    <svg class="h-5 w-5 eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg class="h-5 w-5 eye-slash-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                                </button>
                             </div>
                         </div>
 
@@ -128,8 +134,12 @@
                                     </svg>
                                 </div>
                                 <input type="password" id="password_confirmation" name="password_confirmation" required
-                                    class="block w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-sm placeholder:text-slate-400"
+                                    class="block w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white text-slate-800 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all shadow-sm placeholder:text-slate-400"
                                     placeholder="••••••••">
+                                <button type="button" class="toggle-password absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors" data-target="password_confirmation">
+                                    <svg class="h-5 w-5 eye-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg class="h-5 w-5 eye-slash-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -152,5 +162,26 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const eyeIcon = this.querySelector('.eye-icon');
+                const eyeSlashIcon = this.querySelector('.eye-slash-icon');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eyeIcon.classList.add('hidden');
+                    eyeSlashIcon.classList.remove('hidden');
+                } else {
+                    input.type = 'password';
+                    eyeIcon.classList.remove('hidden');
+                    eyeSlashIcon.classList.add('hidden');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

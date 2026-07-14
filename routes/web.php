@@ -22,6 +22,10 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('register', [AuthController::class, 'register']);
+    
+    // Password Reset (Direct)
+    Route::get('forgot-password', [\App\Http\Controllers\PasswordResetController::class, 'showDirectForm'])->name('password.request');
+    Route::post('forgot-password', [\App\Http\Controllers\PasswordResetController::class, 'updateDirect'])->name('password.update');
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -58,4 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->group(function () {
         Route::resource('karyawan', \App\Http\Controllers\KaryawanController::class)->except(['show', 'create', 'edit']);
     });
+    
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 });

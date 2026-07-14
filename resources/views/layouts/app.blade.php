@@ -141,18 +141,56 @@
         </nav>
 
         {{-- Footer --}}
-        <div class="sidebar-footer">
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; width: 100%;">
-                @csrf
-                <button type="submit" class="upgrade-btn" style="width: 100%; border: none; cursor: pointer;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
+        <div class="sidebar-footer" style="padding: 12px; position: relative;">
+            <div id="profile-dropdown-container">
+                <button type="button" onclick="document.getElementById('profile-dropdown-menu').classList.toggle('show-dropdown')" style="width: 100%; background: transparent; border: none; display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-radius: 12px; text-align: left;" class="hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background-color: #cbd5e1; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #334155; font-size: 15px;">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 13px; color: var(--color-text); line-height: 1.2;">{{ auth()->user()->name }}</div>
+                            <div style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.2; margin-top: 3px;">{{ auth()->user()->email }}</div>
+                        </div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-secondary); margin-left: 8px;">
+                        <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
-                    Logout
                 </button>
-            </form>
+
+                <!-- Dropdown Menu -->
+                <div id="profile-dropdown-menu" style="display: none; position: absolute; bottom: calc(100% + 4px); left: 12px; right: 12px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); padding: 8px; z-index: 50;">
+                    <a href="{{ route('profile.edit') }}" class="dropdown-link" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; text-decoration: none; color: var(--color-text); font-size: 13px; font-weight: 500; border-radius: 8px; transition: background-color 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Lihat Profil
+                    </a>
+                    <div style="height: 1px; background: var(--color-border); margin: 4px 0;"></div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="dropdown-logout" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: transparent; border: none; color: #ef4444; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; text-align: left; transition: background-color 0.2s;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <style>
+                .show-dropdown { display: block !important; }
+                .profile-trigger:hover { background-color: var(--color-surface-hover, #f1f5f9) !important; }
+                .dropdown-link:hover { background-color: var(--color-surface-hover, #f1f5f9) !important; }
+                .dropdown-logout:hover { background-color: #fef2f2 !important; }
+                [data-theme="dark"] .dropdown-logout:hover { background-color: rgba(239, 68, 68, 0.1) !important; }
+            </style>
+            <script>
+                document.addEventListener('click', function(event) {
+                    const container = document.getElementById('profile-dropdown-container');
+                    const menu = document.getElementById('profile-dropdown-menu');
+                    if (container && !container.contains(event.target)) {
+                        menu.classList.remove('show-dropdown');
+                    }
+                });
+            </script>
         </div>
     </aside>
 
@@ -269,8 +307,7 @@
                      </div>
                  </div>
 
-                {{-- Avatar --}}
-                <div class="avatar">A</div>
+                {{-- Avatar moved to sidebar --}}
             </div>
         </header>
 

@@ -110,10 +110,10 @@ body {
 .sidebar-nav .nav-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: 12px;
+    padding: 10px 14px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     color: var(--color-text-secondary);
     text-decoration: none;
@@ -133,8 +133,8 @@ body {
 
 .sidebar-nav .nav-item svg,
 .sidebar-footer .nav-item svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     flex-shrink: 0;
 }
 
